@@ -7,12 +7,12 @@
 from typing import Optional, Dict
 import pandas as pd
 import inspect
-from dataWhisperer.llm_client.openai_client import OpenAIClient
-from dataWhisperer.llm_client.gemini_client import GeminiClient
-from dataWhisperer.prompt_engine.prompt_factory import PromptFactory
-from dataWhisperer.code_executor.executor import run_with_repair
-from dataWhisperer.prompt_engine.prompt_cache import hash_schema, load_cached_prompt, save_cached_prompt
-from dataWhisperer.core_types import InteractiveResponse
+from datawhisperer.llm_client.openai_client import OpenAIClient
+from datawhisperer.llm_client.gemini_client import GeminiClient
+from datawhisperer.prompt_engine.prompt_factory import PromptFactory
+from datawhisperer.code_executor.executor import run_with_repair
+from datawhisperer.prompt_engine.prompt_cache import hash_schema, load_cached_prompt, save_cached_prompt
+from datawhisperer.core_types import InteractiveResponse
 
 
 class DataFrameChatbot:
@@ -22,7 +22,8 @@ class DataFrameChatbot:
         model: str,
         dataframe: Optional[pd.DataFrame] = None,
         schema: Optional[Dict[str, str]] = None,
-        dataframe_name: Optional[str] = None
+        dataframe_name: Optional[str] = None,
+        llm_client=None 
     ) -> None:
         self.api_key = api_key
         self.model = model
@@ -44,14 +45,16 @@ class DataFrameChatbot:
             raise ValueError("Could not infer the name of the DataFrame. Please provide it manually.")
 
         self.dataframe_name = dataframe_name
-        self.client = self._init_llm_client(api_key, model)
+        self.client = llm_client or self._init_llm_client(api_key, model)
 
         # 🧠 Cache the system prompt
         schema_hash = hash_schema(self.schema)
         cached_prompt = load_cached_prompt(schema_hash)
 
         if cached_prompt is None:
-            prompt_factory = PromptFactory(api_key, model, dataframe_name, self.schema)
+            prompt_factory = PromptFactory(
+                api_key, model, dataframe_name, self.schema, client=self.client
+            )
             system_prompt = prompt_factory.build_system_prompt()
             save_cached_prompt(schema_hash, system_prompt)
         else:

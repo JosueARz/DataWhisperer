@@ -7,7 +7,7 @@ import io
 import ast
 import re
 from typing import Any, Dict, Tuple, Optional
-from dataWhisperer.code_executor.fixer import CodeFixer 
+from datawhisperer.code_executor.fixer import CodeFixer 
 import pandas as pd
 import plotly.graph_objects as go
 

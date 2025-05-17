@@ -2,8 +2,8 @@
 # Licensed under the Apache License, Version 2.0
 # http://www.apache.org/licenses/LICENSE-2.0
 
-from dataWhisperer.llm_client.openai_client import OpenAIClient
-from dataWhisperer.llm_client.gemini_client import GeminiClient
+from datawhisperer.llm_client.openai_client import OpenAIClient
+from datawhisperer.llm_client.gemini_client import GeminiClient
 from typing import Dict
 
 

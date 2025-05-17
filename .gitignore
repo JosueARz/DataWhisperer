@@ -9,7 +9,7 @@ __pycache__/
 venv/
 entorno/
 data_pruebas
-pruebas
+pruebas.ipynb
 .env
 <<<<<<< HEAD
 .ipynb_checkpoints/

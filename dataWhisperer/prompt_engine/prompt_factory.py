@@ -5,7 +5,7 @@
 """System prompt generator, built by OpenAI model based on the provided schema."""
 
 from typing import Dict
-from dataWhisperer.llm_client.openai_client import OpenAIClient
+from datawhisperer.llm_client.openai_client import OpenAIClient
 
 
 class PromptFactory:
@@ -19,7 +19,8 @@ class PromptFactory:
         api_key: str,
         model: str,
         dataframe_name: str,
-        schema: Dict[str, str]
+        schema: Dict[str, str],
+        client=None  # ✅ nuevo parámetro opcional
     ) -> None:
         """
         Initializes the factory with a connection to the OpenAI client.
@@ -32,7 +33,7 @@ class PromptFactory:
         """
         self.dataframe_name = dataframe_name
         self.schema = schema
-        self.client = OpenAIClient(api_key, model)
+        self.client = client or OpenAIClient(api_key, model)
 
     def build_system_prompt(self) -> str:
         """
