@@ -1,0 +1,61 @@
+<<<<<<< HEAD
+=======
+# === Python & entorno virtual ===
+>>>>>>> 7f86e29dbc160829c566a615285cca653da20d5e
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+venv/
+entorno/
+data_pruebas
+pruebas
+.env
+<<<<<<< HEAD
+.ipynb_checkpoints/
+=======
+.env.*
+
+# === Jupyter ===
+.ipynb_checkpoints/
+.prompt_cache/
+*.egg-info/
+
+# === Archivos de prueba / datos locales ===
+>>>>>>> 7f86e29dbc160829c566a615285cca653da20d5e
+*.csv
+*.log
+*.sqlite3
+*.db
+<<<<<<< HEAD
+build/
+dist/
+*.egg-info/
+=======
+
+# === Build y distribución ===
+build/
+dist/
+*.egg-info/
+.eggs/
+*.manifest
+*.spec
+
+# === IDE y configuración local ===
+>>>>>>> 7f86e29dbc160829c566a615285cca653da20d5e
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+<<<<<<< HEAD
+=======
+
+# === Otros (si usas estas herramientas, reactiva) ===
+# .pdm.toml
+# .pdm-python
+# .ruff_cache/
+# .pypirc
+# /site
+
+
+>>>>>>> 7f86e29dbc160829c566a615285cca653da20d5e
