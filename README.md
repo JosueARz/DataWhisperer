@@ -71,6 +71,59 @@ response
 
 DataWhisperer turns that into runnable Python code with results.
 
+# 🧪 Test Suite para DataWhisperer
+
+Este directorio contiene pruebas unitarias para los módulos principales del proyecto `datawhisperer`. La suite está diseñada para garantizar la robustez de cada componente y facilitar su evolución segura.
+
+---
+
+## 📂 Estructura de Pruebas
+
+- **`test_chatbot.py`**  
+  Verifica que `DataFrameChatbot`:
+  - Se inicializa correctamente
+  - Maneja correctamente el `schema`
+  - Permite el uso de `FakeClient` para evitar llamadas reales a la API
+  - Infiera correctamente el nombre del DataFrame
+
+- **`test_executor.py`**  
+  Cubre a fondo:
+  - Sanitización del código LLM (`sanitize_code`)
+  - Ejecución segura (`run_user_code`)
+  - Reparación automática (`run_with_repair`)
+  - Detección de outputs (últimos `DataFrame`, `Plotly`, y expresiones)
+
+- **`test_fixer.py`**  
+  Valida que `CodeFixer`:
+  - Genere prompts de reparación adecuados
+  - Elija correctamente el cliente (`OpenAIClient` o `GeminiClient`)
+  - Devuelva el código corregido esperado a partir de un error simulado
+
+- **`test_prompt_factory.py`**  
+  Asegura que `PromptFactory`:
+  - Construya correctamente el mensaje del rol `system`
+  - Utilice correctamente la descripción del `schema`
+  - Sea testable mediante `FakeClient`
+
+---
+
+## 🚀 Ejecución de pruebas
+
+### ▶️ Ejecutar todas las pruebas
+```bash
+pytest
+pytest --cov=datawhisperer --cov-report=term-missing
+```
+
+### 📌 Notas
+- Las pruebas evitan hacer llamadas reales a OpenAI o Gemini usando clases FakeClient.
+
+- Todos los módulos pueden ser testeados de forma aislada.
+
+- La cobertura actual supera el 65%, con especial foco en el núcleo del sistema.
+
+- Se recomienda ejecutar las pruebas como parte del pipeline CI/CD.
+
 ## 🔒 License
 This project is licensed under the Apache License 2.0 — you are free to use, modify, and distribute it as long as you credit the author.
 
