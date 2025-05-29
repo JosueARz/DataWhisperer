@@ -7,7 +7,7 @@ name = "datawhisperer"
 version = "0.1.0"
 description = "Natural language interface for DataFrames using LLMs"
 readme = "README.md"
-license = { text = "Apache-2.0" }
+license = "Apache-2.0"
 authors = [
   { name = "JosueARz", email = "josueayalaruiz@gmail.com" }
 ]
@@ -17,7 +17,6 @@ classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Developers",
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
-  "License :: OSI Approved :: Apache Software License",
   "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",

@@ -43,4 +43,4 @@ class OpenAIClient:
         response = openai.ChatCompletion.create(
             model=self.model, messages=messages, temperature=temperature
         )
-        return response.choices[0].message["content"].strip()
+        return response.choices[0].message.content.strip()

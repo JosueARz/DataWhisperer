@@ -53,6 +53,7 @@ class PromptFactory:
         - Never create dummy data or use pandas.read_csv, read_excel, or any external sources.
         - The code must be **complete, functional, and runnable without any additional context**.
         - Always include the necessary `import` statements at the top.
+        - Always iclude the import of libraries.
         - Do not use `matplotlib`, `seaborn`, or any `plt.show()` calls.
         - If using Plotly, **do NOT include `fig.show()`** — assume the environment (like Jupyter) will display it.
         - If the question requires multiple DataFrames or preprocessing steps:
