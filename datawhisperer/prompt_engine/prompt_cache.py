@@ -14,10 +14,10 @@ CACHE_DIR.mkdir(exist_ok=True)
 def hash_schema(schema: Dict[str, str]) -> str:
     """
     Generates a deterministic hash from the schema dictionary.
-    
+
     Args:
         schema (Dict[str, str]): Column schema dictionary.
-    
+
     Returns:
         str: MD5 hash representing the schema.
     """
@@ -31,7 +31,7 @@ def load_cached_prompt(hash_value: str) -> Optional[str]:
 
     Args:
         hash_value (str): The hash representing the schema.
-    
+
     Returns:
         Optional[str]: Cached system prompt content or None.
     """

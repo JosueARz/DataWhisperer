@@ -2,11 +2,15 @@
 # Licensed under the Apache License, Version 2.0
 # http://www.apache.org/licenses/LICENSE-2.0
 
-import pandas as pd
 import json
 
+import pandas as pd
+
+
 class InteractiveResponse:
-    def __init__(self, text: str = "", value=None, code: str = "", table: pd.DataFrame = None, chart=None):
+    def __init__(
+        self, text: str = "", value=None, code: str = "", table: pd.DataFrame = None, chart=None
+    ):
         self.text = text or ""
         self.table = table
         self.chart = chart
@@ -17,7 +21,7 @@ class InteractiveResponse:
         return {
             "text": self.text,
             "table": self._serialize_table(),
-            "chart": self._serialize_chart()
+            "chart": self._serialize_chart(),
         }
 
     def _serialize_table(self):
@@ -35,6 +39,7 @@ class InteractiveResponse:
 
     def _repr_html_(self):
         from IPython.display import HTML
+
         html = ""
 
         # 1. Display text

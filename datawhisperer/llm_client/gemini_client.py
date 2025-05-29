@@ -4,7 +4,8 @@
 
 """Minimal client for interacting with Google's Gemini API."""
 
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
+
 import google.generativeai as genai
 from google.generativeai.types import GenerationConfig
 
@@ -82,18 +83,12 @@ class GeminiClient:
 
         try:
             model = genai.GenerativeModel(
-                model_name=self.default_model_name,
-                system_instruction=system_instruction
+                model_name=self.default_model_name, system_instruction=system_instruction
             )
 
-            config = GenerationConfig(
-                temperature=temperature
-            )
+            config = GenerationConfig(temperature=temperature)
 
-            response = model.generate_content(
-                contents=chat_history,
-                generation_config=config
-            )
+            response = model.generate_content(contents=chat_history, generation_config=config)
 
             if response.candidates:
                 candidate = response.candidates[0]

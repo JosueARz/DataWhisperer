@@ -2,9 +2,10 @@
 # Licensed under the Apache License, Version 2.0
 # http://www.apache.org/licenses/LICENSE-2.0
 
-from datawhisperer.llm_client.openai_client import OpenAIClient
-from datawhisperer.llm_client.gemini_client import GeminiClient
 from typing import Dict
+
+from datawhisperer.llm_client.gemini_client import GeminiClient
+from datawhisperer.llm_client.openai_client import OpenAIClient
 
 
 class CodeFixer:
@@ -20,12 +21,7 @@ class CodeFixer:
             self.client = OpenAIClient(api_key=api_key, model=model)
 
     def fix_code(
-        self,
-        question: str,
-        code: str,
-        error: str,
-        schema: Dict[str, str],
-        dataframe_name: str
+        self, question: str, code: str, error: str, schema: Dict[str, str], dataframe_name: str
     ) -> str:
         """
         Generates a corrected version of the failed code using the selected LLM.
@@ -40,9 +36,7 @@ class CodeFixer:
         Returns:
             str: The corrected Python code.
         """
-        schema_description = "\n".join(
-            f"- {col}: {desc}" for col, desc in schema.items()
-        )
+        schema_description = "\n".join(f"- {col}: {desc}" for col, desc in schema.items())
 
         prompt = f"""
         You previously generated the following Python code to answer a user's question:

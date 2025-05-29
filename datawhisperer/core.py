@@ -4,15 +4,21 @@
 
 """Main orchestrator: chatbot to interact with a DataFrame using natural language."""
 
-from typing import Optional, Dict
-import pandas as pd
 import inspect
-from datawhisperer.llm_client.openai_client import OpenAIClient
-from datawhisperer.llm_client.gemini_client import GeminiClient
-from datawhisperer.prompt_engine.prompt_factory import PromptFactory
+from typing import Dict, Optional
+
+import pandas as pd
+
 from datawhisperer.code_executor.executor import run_with_repair
-from datawhisperer.prompt_engine.prompt_cache import hash_schema, load_cached_prompt, save_cached_prompt
 from datawhisperer.core_types import InteractiveResponse
+from datawhisperer.llm_client.gemini_client import GeminiClient
+from datawhisperer.llm_client.openai_client import OpenAIClient
+from datawhisperer.prompt_engine.prompt_cache import (
+    hash_schema,
+    load_cached_prompt,
+    save_cached_prompt,
+)
+from datawhisperer.prompt_engine.prompt_factory import PromptFactory
 
 
 class DataFrameChatbot:
@@ -23,7 +29,7 @@ class DataFrameChatbot:
         dataframe: Optional[pd.DataFrame] = None,
         schema: Optional[Dict[str, str]] = None,
         dataframe_name: Optional[str] = None,
-        llm_client=None 
+        llm_client=None,
     ) -> None:
         self.api_key = api_key
         self.model = model
@@ -42,7 +48,9 @@ class DataFrameChatbot:
                 del frame
 
         if dataframe_name is None:
-            raise ValueError("Could not infer the name of the DataFrame. Please provide it manually.")
+            raise ValueError(
+                "Could not infer the name of the DataFrame. Please provide it manually."
+            )
 
         self.dataframe_name = dataframe_name
         self.client = llm_client or self._init_llm_client(api_key, model)
@@ -74,7 +82,7 @@ class DataFrameChatbot:
     def ask(self, question: str) -> str:
         messages = [
             {"role": "system", "content": self.system_prompt},
-            {"role": "user", "content": question}
+            {"role": "user", "content": question},
         ]
         return self.client.chat(messages)
 
@@ -91,7 +99,7 @@ class DataFrameChatbot:
             schema=self.schema,
             dataframe_name=self.dataframe_name,
             api_key=self.api_key,
-            model=self.model
+            model=self.model,
         )
 
         return InteractiveResponse(
@@ -99,5 +107,5 @@ class DataFrameChatbot:
             value=table if table is not None else chart,
             code=final_code,
             table=table,
-            chart=chart
+            chart=chart,
         )

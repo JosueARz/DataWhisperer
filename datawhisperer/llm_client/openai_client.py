@@ -4,7 +4,8 @@
 
 """Minimal client for interacting with the OpenAI API."""
 
-from typing import List, Dict
+from typing import Dict, List
+
 import openai
 
 
@@ -32,7 +33,7 @@ class OpenAIClient:
         Sends a list of chat-formatted messages and returns the model's response.
 
         Args:
-            messages (List[Dict[str, str]]): List of messages like 
+            messages (List[Dict[str, str]]): List of messages like
                 [{"role": "system", "content": "..."}, {"role": "user", "content": "..."}]
             temperature (float): Randomness level of the response.
 
@@ -40,8 +41,6 @@ class OpenAIClient:
             str: Text content of the model's reply.
         """
         response = openai.ChatCompletion.create(
-            model=self.model,
-            messages=messages,
-            temperature=temperature
+            model=self.model, messages=messages, temperature=temperature
         )
         return response.choices[0].message["content"].strip()

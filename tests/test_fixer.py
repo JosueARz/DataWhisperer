@@ -1,7 +1,8 @@
 import pytest
+
 from datawhisperer.code_executor.fixer import CodeFixer
-from datawhisperer.llm_client.openai_client import OpenAIClient
 from datawhisperer.llm_client.gemini_client import GeminiClient
+from datawhisperer.llm_client.openai_client import OpenAIClient
 
 
 class FakeClient:
@@ -32,7 +33,7 @@ def test_fix_code_returns_expected_code(fixer_with_fake_client):
         code=code_with_error,
         error=error_message,
         schema=schema,
-        dataframe_name=dataframe_name
+        dataframe_name=dataframe_name,
     )
 
     assert "print('OK')" in fixed_code

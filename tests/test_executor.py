@@ -1,20 +1,27 @@
 import pandas as pd
 import plotly.graph_objects as go
-from datawhisperer.code_executor.executor import sanitize_code
-from datawhisperer.code_executor.executor import run_user_code
-from datawhisperer.code_executor.executor import detect_last_dataframe
-from datawhisperer.code_executor.executor import detect_last_plotly_chart
-from datawhisperer.code_executor.executor import run_with_repair
 import pytest
 
-@pytest.mark.parametrize("input_code, expected", [
-    ("```python\nprint('Hello')\n```", "print('Hello')"),
-    ("```print('Hola')```", "print('Hola')"),
-    ("print('Hello')", "print('Hello')"),
-    ("fig.show()", ""),
-    ("plt.show()", ""),
-    ("print('Start')\nfig.show()\nprint('End')", "print('Start')\n\nprint('End')"),
-])
+from datawhisperer.code_executor.executor import (
+    detect_last_dataframe,
+    detect_last_plotly_chart,
+    run_user_code,
+    run_with_repair,
+    sanitize_code,
+)
+
+
+@pytest.mark.parametrize(
+    "input_code, expected",
+    [
+        ("```python\nprint('Hello')\n```", "print('Hello')"),
+        ("```print('Hola')```", "print('Hola')"),
+        ("print('Hello')", "print('Hello')"),
+        ("fig.show()", ""),
+        ("plt.show()", ""),
+        ("print('Start')\nfig.show()\nprint('End')", "print('Start')\n\nprint('End')"),
+    ],
+)
 def test_sanitize_code(input_code, expected):
     assert sanitize_code(input_code) == expected
 
@@ -25,14 +32,18 @@ df2 = df[df['sales'] > 100]
 print("Filtrado completado")
 """
     context = {
-        "df": pd.DataFrame({
-            "region": ["North", "South", "East"],
-            "sales": [100, 200, 300],
-            "date": ["2024-01-01", "2024-01-02", "2024-01-03"]
-        })
+        "df": pd.DataFrame(
+            {
+                "region": ["North", "South", "East"],
+                "sales": [100, 200, 300],
+                "date": ["2024-01-01", "2024-01-02", "2024-01-03"],
+            }
+        )
     }
 
-    output_text, table_result, chart_result, final_code, success = run_user_code(code, context, dataframe_name="df")
+    output_text, table_result, chart_result, final_code, success = run_user_code(
+        code, context, dataframe_name="df"
+    )
 
     assert success is True
     assert "Filtrado completado" in output_text
@@ -49,7 +60,9 @@ fig = go.Figure(data=go.Bar(y=[2, 3, 1]))
 """
     context = {}
 
-    output_text, table_result, chart_result, final_code, success = run_user_code(code, context, dataframe_name="df")
+    output_text, table_result, chart_result, final_code, success = run_user_code(
+        code, context, dataframe_name="df"
+    )
 
     assert success is True
     assert chart_result is not None
@@ -64,14 +77,18 @@ def test_run_user_code_with_error():
 df2 = df[df['ventas'] > 100]
 """
     context = {
-        "df": pd.DataFrame({
-            "region": ["North", "South"],
-            "sales": [100, 200],
-            "date": ["2024-01-01", "2024-01-02"]
-        })
+        "df": pd.DataFrame(
+            {
+                "region": ["North", "South"],
+                "sales": [100, 200],
+                "date": ["2024-01-01", "2024-01-02"],
+            }
+        )
     }
 
-    output_text, table_result, chart_result, final_code, success = run_user_code(code, context, dataframe_name="df")
+    output_text, table_result, chart_result, final_code, success = run_user_code(
+        code, context, dataframe_name="df"
+    )
 
     assert success is False
     assert "Execution error" in output_text or "KeyError" in output_text
@@ -96,7 +113,7 @@ def test_detect_last_dataframe():
 def test_detect_last_dataframe_none():
     df = pd.DataFrame({"x": [1, 2]})
     context = {"df": df}
-    
+
     result = detect_last_dataframe(context, dataframe_name="df")
     assert result is None
 
@@ -116,10 +133,7 @@ def test_detect_last_plotly_chart():
 
 
 def test_detect_last_plotly_chart_none():
-    context = {
-        "value": 123,
-        "df": pd.DataFrame({"a": [1, 2]})
-    }
+    context = {"value": 123, "df": pd.DataFrame({"a": [1, 2]})}
 
     result = detect_last_plotly_chart(context)
     assert result is None
