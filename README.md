@@ -71,58 +71,79 @@ response
 
 DataWhisperer turns that into runnable Python code with results.
 
-# 🧪 Test Suite para DataWhisperer
+# 🧪 Test Suite for DataWhisperer
 
-Este directorio contiene pruebas unitarias para los módulos principales del proyecto `datawhisperer`. La suite está diseñada para garantizar la robustez de cada componente y facilitar su evolución segura.
-
----
-
-## 📂 Estructura de Pruebas
-
-- **`test_chatbot.py`**  
-  Verifica que `DataFrameChatbot`:
-  - Se inicializa correctamente
-  - Maneja correctamente el `schema`
-  - Permite el uso de `FakeClient` para evitar llamadas reales a la API
-  - Infiera correctamente el nombre del DataFrame
-
-- **`test_executor.py`**  
-  Cubre a fondo:
-  - Sanitización del código LLM (`sanitize_code`)
-  - Ejecución segura (`run_user_code`)
-  - Reparación automática (`run_with_repair`)
-  - Detección de outputs (últimos `DataFrame`, `Plotly`, y expresiones)
-
-- **`test_fixer.py`**  
-  Valida que `CodeFixer`:
-  - Genere prompts de reparación adecuados
-  - Elija correctamente el cliente (`OpenAIClient` o `GeminiClient`)
-  - Devuelva el código corregido esperado a partir de un error simulado
-
-- **`test_prompt_factory.py`**  
-  Asegura que `PromptFactory`:
-  - Construya correctamente el mensaje del rol `system`
-  - Utilice correctamente la descripción del `schema`
-  - Sea testable mediante `FakeClient`
+This directory contains unit tests for the core modules of the `datawhisperer` project.  
+The test suite is designed to ensure the robustness of each component and support safe and reliable evolution of the codebase.
 
 ---
 
-## 🚀 Ejecución de pruebas
+## 📂 Test Structure
+- test_chatbot.py
+     Verifies that DataFrameChatbot:
 
-### ▶️ Ejecutar todas las pruebas
+   - Initializes correctly
+
+   - Handles the provided schema as expected
+
+   - Allows the use of a FakeClient to avoid real API calls
+
+   - Correctly infers the name of the DataFrame
+
+- test_executor.py
+     Thoroughly tests:
+
+   - LLM code sanitization (sanitize_code)
+
+   - Secure code execution (run_user_code)
+
+   - Automatic code repair (run_with_repair)
+
+   - Output detection (last DataFrame, Plotly charts, expressions)
+
+- test_fixer.py
+   Validates that CodeFixer:
+
+   - Generates appropriate repair prompts
+
+   - Correctly selects the client (OpenAIClient or GeminiClient)
+
+   - Returns the expected fixed code based on simulated errors
+
+- test_prompt_factory.py
+    Ensures that PromptFactory:
+
+   - Correctly builds the system role message
+
+   - Properly uses the schema description
+
+   - Is testable using a FakeClient
+
+
+---
+
+## 🚀 Run all tests
+
+### ▶️ Run tests with coverage report
 ```bash
 pytest
 pytest --cov=datawhisperer --cov-report=term-missing
 ```
 
-### 📌 Notas
-- Las pruebas evitan hacer llamadas reales a OpenAI o Gemini usando clases FakeClient.
+### 📌  Notes
+- Tests avoid real calls to OpenAI or Gemini by using FakeClient classes.
 
-- Todos los módulos pueden ser testeados de forma aislada.
+- All modules are designed to be tested in isolation.
 
-- La cobertura actual supera el 65%, con especial foco en el núcleo del sistema.
+- Current test coverage exceeds 65%, with special focus on the system core.
 
-- Se recomienda ejecutar las pruebas como parte del pipeline CI/CD.
+- It is recommended to run tests as part of the CI/CD pipeline.
+
+
+## 📋 Version History
+
+See the [registro de cambios](./CHANGELOG.md) for a full list of updates and improvements.
+
 
 ## 🔒 License
 This project is licensed under the Apache License 2.0 — you are free to use, modify, and distribute it as long as you credit the author.
