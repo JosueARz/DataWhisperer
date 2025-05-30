@@ -6,7 +6,6 @@
 
 import inspect
 from typing import Dict, Optional
-
 import pandas as pd
 
 from datawhisperer.code_executor.executor import run_with_repair
@@ -33,7 +32,7 @@ class DataFrameChatbot:
     ) -> None:
         self.api_key = api_key
         self.model = model
-        self.schema = schema or {}
+        self._schema = schema or {}
 
         # 🔍 Infer the DataFrame name if not provided
         if dataframe_name is None and dataframe is not None:
@@ -55,29 +54,26 @@ class DataFrameChatbot:
         self.dataframe_name = dataframe_name
         self.client = llm_client or self._init_llm_client(api_key, model)
 
-        # 🧠 Cache the system prompt
-        schema_hash = hash_schema(self.schema)
+        
+        schema_hash = hash_schema(self._schema)
         cached_prompt = load_cached_prompt(schema_hash)
 
         if cached_prompt is None:
             prompt_factory = PromptFactory(
-                api_key, model, dataframe_name, self.schema, client=self.client
+                api_key, model, dataframe_name, self._schema, client=self.client
             )
             system_prompt = prompt_factory.build_system_prompt()
             save_cached_prompt(schema_hash, system_prompt)
         else:
             system_prompt = cached_prompt
 
-        self.system_prompt = system_prompt
-        self.context = {dataframe_name: dataframe} if dataframe is not None else {}
+        self._system_prompt = system_prompt
+        self._context = {dataframe_name: dataframe} if dataframe is not None else {}
 
     def _init_llm_client(self, api_key: str, model: str):
-        """
-        Initializes the appropriate LLM client based on the selected model.
-        """
         if model.startswith("gemini"):
             return GeminiClient(api_key, model_name=model)
-        return OpenAIClient(api_key, model=model)
+        return OpenAIClient(api_key=api_key, model=model)
 
     def ask(self, question: str) -> str:
         messages = [
@@ -90,13 +86,13 @@ class DataFrameChatbot:
         code = self.ask(question)
 
         if debug:
-            print("🧠 Generated code:\n", code)
+            pass
 
         text, table, chart, final_code, success = run_with_repair(
             code=code,
             question=question,
-            context=self.context,
-            schema=self.schema,
+            context=self.context,         
+            schema=self.schema,           
             dataframe_name=self.dataframe_name,
             api_key=self.api_key,
             model=self.model,
@@ -109,3 +105,17 @@ class DataFrameChatbot:
             table=table,
             chart=chart,
         )
+
+    # --- PROPIEDADES PROTEGIDAS ---
+
+    @property
+    def schema(self) -> Dict[str, str]:
+        return self._schema.copy()
+
+    @property
+    def context(self) -> Dict[str, object]:
+        return self._context.copy()
+
+    @property
+    def system_prompt(self) -> str:
+        return self._system_prompt

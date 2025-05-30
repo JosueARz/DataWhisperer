@@ -96,11 +96,12 @@ def run_user_code(
         if last_expr:
             parsed.body = parsed.body[:-1]
 
-        exec(compile(ast.Module(parsed.body, type_ignores=[]), "<exec>", "exec"), context)
+        local_context = context.copy()
+        exec(compile(ast.Module(parsed.body, type_ignores=[]), "<exec>", "exec"), local_context)
 
         final_value = None
         if last_expr:
-            final_value = eval(compile(ast.Expression(last_expr.value), "<eval>", "eval"), context)
+            final_value = eval(compile(ast.Expression(last_expr.value), "<eval>", "eval"), local_context)
 
         output_text = context.get("Respuesta") or stdout.getvalue().strip()
 

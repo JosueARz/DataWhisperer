@@ -5,42 +5,39 @@
 """Minimal client for interacting with the OpenAI API."""
 
 from typing import Dict, List
-
-import openai
-
+from openai import OpenAI
 
 class OpenAIClient:
     """
-    Client to send chat-based requests to the OpenAI API using ChatCompletion.
-
-    Attributes:
-        model (str): Name of the model to use.
+    Cliente para enviar solicitudes de chat a la API de OpenAI utilizando el nuevo cliente OpenAI.
     """
 
     def __init__(self, api_key: str, model: str = "gpt-4.1-mini") -> None:
         """
-        Initializes the client with the provided API key and model.
+        Inicializa el cliente con la clave de API proporcionada y el modelo especificado.
 
         Args:
-            api_key (str): OpenAI API key.
-            model (str): Model to use (default is "gpt-4.1-mini").
+            api_key (str): Clave de API de OpenAI.
+            model (str): Modelo a utilizar (por defecto es "gpt-4.1-mini").
         """
-        openai.api_key = api_key
+        self.client = OpenAI(api_key=api_key)
         self.model = model
 
     def chat(self, messages: List[Dict[str, str]], temperature: float = 0.3) -> str:
         """
-        Sends a list of chat-formatted messages and returns the model's response.
+        Envía una lista de mensajes formateados para chat y devuelve la respuesta del modelo.
 
         Args:
-            messages (List[Dict[str, str]]): List of messages like
+            messages (List[Dict[str, str]]): Lista de mensajes como
                 [{"role": "system", "content": "..."}, {"role": "user", "content": "..."}]
-            temperature (float): Randomness level of the response.
+            temperature (float): Nivel de aleatoriedad de la respuesta.
 
         Returns:
-            str: Text content of the model's reply.
+            str: Contenido de texto de la respuesta del modelo.
         """
-        response = openai.ChatCompletion.create(
-            model=self.model, messages=messages, temperature=temperature
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            temperature=temperature
         )
         return response.choices[0].message.content.strip()

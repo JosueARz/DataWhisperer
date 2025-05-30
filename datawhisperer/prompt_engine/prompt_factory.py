@@ -68,5 +68,4 @@ class PromptFactory:
         {schema_description}
         """
 
-        messages = [{"role": "user", "content": instruction}]
-        return self.client.chat(messages)
+        return instruction.strip()

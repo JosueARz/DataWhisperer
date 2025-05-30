@@ -4,7 +4,7 @@ Todas las versiones y cambios relevantes de la librería `datawhisperer`.
 
 ---
 
-## [v0.1.0] - 2025-05-29
+## [v0.1.3] - 2025-05-29
 
 Versión inicial pública de `datawhisperer`.
 

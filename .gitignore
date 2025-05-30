@@ -8,8 +8,10 @@ __pycache__/
 *.pyd
 venv/
 entorno/
-data_pruebas
+.venv/
+data_pruebas.csv
 pruebas.ipynb
+prueba.ipynb
 .env
 dummy.txt
 <<<<<<< HEAD
