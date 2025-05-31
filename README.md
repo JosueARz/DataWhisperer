@@ -21,7 +21,7 @@
 ## 🧱 Installation
 
 ```bash
-pip install datawhisperer
+pip install -i https://test.pypi.org/simple/ datawhisperer
 ```
 
 Requires Python 3.8+
