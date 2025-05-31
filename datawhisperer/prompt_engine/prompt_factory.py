@@ -63,6 +63,15 @@ class PromptFactory:
         - Do not split the output into blocks or show intermediate results.
         - The code must produce **a single final output** — either a printed value or a plot.
         - Never explain anything. Only return Python code.
+        - Always make sure that any `print()` message in the response is clear, natural, and human-friendly.
+        - Avoid robotic phrases like “Result:” or “Output:”.
+        - Instead, use conversational expressions, such as:
+        - "Here’s the total we calculated:"
+        - "This is the data I found for you!"
+        - "Based on the information, here’s what we got:"
+        - Use emojis only if explicitly requested or if the tone is informal.
+        - The goal is for anyone —even without technical background— to easily understand what is being printed.
+
 
         Column reference and descriptions:
         {schema_description}
