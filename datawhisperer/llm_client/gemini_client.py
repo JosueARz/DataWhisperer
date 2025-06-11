@@ -4,7 +4,7 @@
 
 """Minimal client for interacting with Google's Gemini API."""
 
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import google.generativeai as genai
 from google.generativeai.types import GenerationConfig
@@ -12,7 +12,7 @@ from google.generativeai.types import GenerationConfig
 
 class GeminiClient:
     """
-    Client to send chat-style requests to Google's Gemini API.
+    Client for sending chat-style requests to Google's Gemini API.
 
     Attributes:
         default_model_name (str): Default Gemini model to use.
@@ -20,44 +20,40 @@ class GeminiClient:
 
     def __init__(self, api_key: str, model_name: str = "gemini-1.5-flash-latest") -> None:
         """
-        Initializes the client with the Google API key and model.
+        Initializes the Gemini client.
 
         Args:
             api_key (str): Google Generative AI API key.
-            model_name (str): Gemini model to use (default: "gemini-1.5-flash-latest").
+            model_name (str): Gemini model name (default: "gemini-1.5-flash-latest").
         """
         genai.configure(api_key=api_key)
         self.default_model_name = model_name
 
     def chat(self, messages: List[Dict[str, str]], temperature: float = 0.3) -> str:
         """
-        Sends a list of chat-formatted messages and returns the Gemini model's response.
+        Sends chat-formatted messages to the Gemini API and returns the response.
 
-        The expected format of `messages` is OpenAI-compatible:
-        [
-            {"role": "system", "content": "System instruction..."},
-            {"role": "user", "content": "User message..."},
-            {"role": "assistant", "content": "Previous assistant reply..."}
-        ]
-
-        Note: "assistant" is mapped to "model" for Gemini API compatibility.
+        The input format should match OpenAI-style chat logs:
+            - "system": system prompt.
+            - "user": user message.
+            - "assistant": previous model reply (mapped to "model" for Gemini).
 
         Args:
-            messages (list): List of messages in chat format.
-            temperature (float): Randomness level (Gemini accepts 0.0–2.0 depending on the model).
+            messages (List[Dict[str, str]]): List of chat messages.
+            temperature (float): Controls randomness (range depends on the model).
 
         Returns:
-            str: Text content of the model's response.
+            str: Text content from the Gemini model's response.
         """
         system_instruction: Optional[str] = None
-        chat_history: List[Dict[str, any]] = []
+        chat_history: List[Dict[str, Any]] = []
 
-        for msg in messages:
-            role = msg.get("role")
-            content = msg.get("content")
+        for message in messages:
+            role = message.get("role")
+            content = message.get("content")
 
             if not role or not content:
-                print(f"Warning: Skipping invalid message: {msg}")
+                print(f"Warning: Skipping invalid message: {message}")
                 continue
 
             if role == "system":
@@ -83,12 +79,15 @@ class GeminiClient:
 
         try:
             model = genai.GenerativeModel(
-                model_name=self.default_model_name, system_instruction=system_instruction
+                model_name=self.default_model_name,
+                system_instruction=system_instruction,
             )
-
             config = GenerationConfig(temperature=temperature)
 
-            response = model.generate_content(contents=chat_history, generation_config=config)
+            response = model.generate_content(
+                contents=chat_history,
+                generation_config=config,
+            )
 
             if response.candidates:
                 candidate = response.candidates[0]

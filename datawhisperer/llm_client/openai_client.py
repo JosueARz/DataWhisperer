@@ -7,37 +7,38 @@
 from typing import Dict, List
 from openai import OpenAI
 
+
 class OpenAIClient:
     """
-    Cliente para enviar solicitudes de chat a la API de OpenAI utilizando el nuevo cliente OpenAI.
+    Client for sending chat-style requests to the OpenAI API using the official OpenAI SDK.
     """
 
     def __init__(self, api_key: str, model: str = "gpt-4.1-mini") -> None:
         """
-        Inicializa el cliente con la clave de API proporcionada y el modelo especificado.
+        Initializes the client with the provided API key and model.
 
         Args:
-            api_key (str): Clave de API de OpenAI.
-            model (str): Modelo a utilizar (por defecto es "gpt-4.1-mini").
+            api_key (str): OpenAI API key.
+            model (str): Model to use (default: "gpt-4.1-mini").
         """
         self.client = OpenAI(api_key=api_key)
         self.model = model
 
     def chat(self, messages: List[Dict[str, str]], temperature: float = 0.3) -> str:
         """
-        Envía una lista de mensajes formateados para chat y devuelve la respuesta del modelo.
+        Sends a list of chat-formatted messages and returns the model's response.
 
         Args:
-            messages (List[Dict[str, str]]): Lista de mensajes como
+            messages (List[Dict[str, str]]): List of messages like
                 [{"role": "system", "content": "..."}, {"role": "user", "content": "..."}]
-            temperature (float): Nivel de aleatoriedad de la respuesta.
+            temperature (float): Degree of randomness in the response.
 
         Returns:
-            str: Contenido de texto de la respuesta del modelo.
+            str: Text content of the model's reply.
         """
         response = self.client.chat.completions.create(
             model=self.model,
             messages=messages,
-            temperature=temperature
+            temperature=temperature,
         )
         return response.choices[0].message.content.strip()

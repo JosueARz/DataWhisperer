@@ -16,23 +16,21 @@ from datawhisperer.code_executor.fixer import CodeFixer
 
 def sanitize_code(code: str) -> str:
     """
-    Cleans LLM-generated code by removing Markdown formatting and disallowed calls.
+    Cleans LLM-generated code by removing Markdown formatting and disallowed function calls.
 
     Args:
         code (str): Raw code string from the LLM.
 
     Returns:
-        str: Cleaned Python code.
+        str: Sanitized Python code.
     """
     code = code.strip()
 
-    # Remove triple backticks and optional "python" prefix
     if code.startswith("```"):
         code = code.strip("`").strip()
         if code.startswith("python"):
             code = code[6:].strip()
 
-    # Remove any fig.show() or plt.show() calls
     code = re.sub(r"^\s*(fig|plt)\.show\s*\(\s*\)\s*;?\s*$", "", code, flags=re.MULTILINE)
     code = code.replace("fig.show()", "")
 
@@ -41,7 +39,15 @@ def sanitize_code(code: str) -> str:
 
 def detect_last_of_type(context: Dict[str, Any], expected_type: type, exclude: str = "df") -> Any:
     """
-    Returns the last object of a specific type in the context, excluding a given name.
+    Finds the last object of a given type in the context, excluding a specific name.
+
+    Args:
+        context (Dict[str, Any]): Variable execution context.
+        expected_type (type): Expected type to find.
+        exclude (str): Name to exclude.
+
+    Returns:
+        Any: Last matching object or None.
     """
     for key in reversed(list(context.keys())):
         if key != exclude and isinstance(context[key], expected_type):
@@ -55,9 +61,15 @@ def detect_last_dataframe(
     generated_names: Optional[list[str]] = None,
 ) -> Optional[pd.DataFrame]:
     """
-    Detects the last generated DataFrame (different from the original).
+    Detects the most recent DataFrame different from the original.
 
-    If `generated_names` is provided, uses it to find the most recent valid DataFrame.
+    Args:
+        context (Dict[str, Any]): Execution context.
+        dataframe_name (str): Original DataFrame name.
+        generated_names (Optional[list[str]]): List of newly created variable names.
+
+    Returns:
+        Optional[pd.DataFrame]: Most recent new DataFrame or None.
     """
     original_df = context.get(dataframe_name)
 
@@ -75,10 +87,15 @@ def detect_last_dataframe(
     return None
 
 
-
-def detect_last_plotly_chart(context: Dict[str, Any]) -> Any:
+def detect_last_plotly_chart(context: Dict[str, Any]) -> Optional[go.Figure]:
     """
-    Detects the last Plotly object in the execution context.
+    Detects the last Plotly figure-like object in the context.
+
+    Args:
+        context (Dict[str, Any]): Execution context.
+
+    Returns:
+        Optional[go.Figure]: Last chart-like object or None.
     """
     for key in reversed(list(context.keys())):
         val = context[key]
@@ -88,13 +105,20 @@ def detect_last_plotly_chart(context: Dict[str, Any]) -> Any:
 
 
 def run_user_code(
-    code: str, context: Dict[str, object], dataframe_name: str
+    code: str,
+    context: Dict[str, object],
+    dataframe_name: str,
 ) -> Tuple[str, Any, Any, str, bool]:
     """
-    Executes user-generated code in a controlled context.
+    Executes user-generated Python code within a controlled context.
+
+    Args:
+        code (str): User code to execute.
+        context (Dict[str, object]): Context in which to execute the code.
+        dataframe_name (str): Reference name for the main DataFrame.
 
     Returns:
-        (output_text, table_result, chart_result, final_code, success_flag)
+        Tuple[str, Any, Any, str, bool]: Output text, resulting DataFrame, chart, final code, success flag.
     """
     code = sanitize_code(code)
     stdout = io.StringIO()
@@ -116,20 +140,17 @@ def run_user_code(
 
         exec(compile(ast.Module(parsed.body, type_ignores=[]), "<exec>", "exec"), local_context)
 
-        # Detectar nuevos DataFrames
         after_keys = set(local_context.keys())
         new_vars = list(after_keys - before_keys)
         generated_dataframes = [var for var in new_vars if isinstance(local_context[var], pd.DataFrame)]
-
 
         final_value = None
         if last_expr:
             final_value = eval(compile(ast.Expression(last_expr.value), "<eval>", "eval"), local_context)
 
-        output_text = context.get("Respuesta") or stdout.getvalue().strip()
-
+        output_text = context.get("response") or stdout.getvalue().strip()
         table_result = detect_last_dataframe(local_context, dataframe_name, generated_dataframes)
-        
+
         if table_result is None and isinstance(final_value, pd.DataFrame):
             table_result = final_value
 
@@ -140,17 +161,55 @@ def run_user_code(
         return output_text.strip(), table_result, chart_result, code, True
 
     except ModuleNotFoundError as e:
-        missing_module = str(e).split("'")[1]  # extrae 'XXX' de "No module named 'XXX'"
-        message = f"Para responder esta pregunta, necesitas instalar la librería `{missing_module}`."
+        missing_module = str(e).split("'")[1]
+        message = f"To answer this question, you need to install the `{missing_module}` package."
         return message, None, None, code, False
 
     except Exception as e:
         return f"Execution error:\n{e}", None, None, code, False
 
-
     finally:
         sys.stdout = sys_stdout
 
+
+# def run_with_repair(
+#     code: str,
+#     question: str,
+#     context: Dict[str, object],
+#     schema: Dict[str, str],
+#     dataframe_name: str,
+#     api_key: str,
+#     model: str,
+# ) -> Tuple[str, Any, Any, str, bool]:
+#     """
+#     Executes code generated by an LLM. Attempts automatic repair via LLM if execution fails.
+
+#     Args:
+#         code (str): Initial user code.
+#         question (str): User's question in natural language.
+#         context (Dict[str, object]): Execution context.
+#         schema (Dict[str, str]): DataFrame schema.
+#         dataframe_name (str): Original DataFrame name.
+#         api_key (str): LLM API key.
+#         model (str): Model identifier.
+
+#     Returns:
+#         Tuple[str, Any, Any, str, bool]: Final response, DataFrame, chart, code, success flag.
+#     """
+#     cleaned_code = sanitize_code(code)
+#     text, table, chart, final_code, success = run_user_code(cleaned_code, context, dataframe_name)
+
+#     if success:
+#         return text, table, chart, final_code, True
+
+#     fixer = CodeFixer(api_key, model)
+#     repaired_code = fixer.fix_code(question, cleaned_code, text, schema, dataframe_name)
+
+#     repaired_text, repaired_table, repaired_chart, _, repaired_success = run_user_code(
+#         repaired_code, context, dataframe_name
+#     )
+
+#     return repaired_text, repaired_table, repaired_chart, repaired_code, repaired_success
 
 def run_with_repair(
     code: str,
@@ -160,24 +219,43 @@ def run_with_repair(
     dataframe_name: str,
     api_key: str,
     model: str,
+    max_retries: int = 3  
 ) -> Tuple[str, Any, Any, str, bool]:
     """
-    Executes code generated by an LLM. If execution fails, attempts automatic repair via LLM.
+    Executes code generated by an LLM. Attempts automatic repair via LLM if execution fails.
 
     Returns:
-        (final_text, final_table, final_chart, final_code, success_flag)
+        Tuple[str, Any, Any, str, bool]: Final response, DataFrame, chart, code, success flag.
     """
-    code_clean = sanitize_code(code)
-    text, table, chart, final_code, success = run_user_code(code_clean, context, dataframe_name)
+    fixer = CodeFixer(api_key, model)
+    cleaned_code = sanitize_code(code)
 
+    # First try
+    text, table, chart, final_code, success = run_user_code(cleaned_code, context, dataframe_name)
     if success:
         return text, table, chart, final_code, True
 
-    fixer = CodeFixer(api_key, model)
-    repaired_code = fixer.fix_code(question, code_clean, text, schema, dataframe_name)
+    # Tries with auto repair
+    current_code = cleaned_code
+    current_error = text
 
-    repaired_text, repaired_table, repaired_chart, _, repaired_success = run_user_code(
-        repaired_code, context, dataframe_name
-    )
+    for _ in range(max_retries):
+        repaired_code = fixer.fix_code(
+            question=question,
+            code=current_code,
+            error=current_error,
+            schema=schema,
+            dataframe_name=dataframe_name,
+        )
 
-    return repaired_text, repaired_table, repaired_chart, repaired_code, repaired_success
+        repaired_text, repaired_table, repaired_chart, _, repaired_success = run_user_code(
+            repaired_code, context, dataframe_name
+        )
+
+        if repaired_success:
+            return repaired_text, repaired_table, repaired_chart, repaired_code, True
+
+        current_code = repaired_code
+        current_error = repaired_text  # new erro for LLM
+
+    return repaired_text, repaired_table, repaired_chart, repaired_code, False

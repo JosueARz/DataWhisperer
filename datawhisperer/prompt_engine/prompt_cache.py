@@ -13,13 +13,13 @@ CACHE_DIR.mkdir(exist_ok=True)
 
 def hash_schema(schema: Dict[str, str]) -> str:
     """
-    Generates a deterministic hash from the schema dictionary.
+    Generates a deterministic MD5 hash based on the given schema dictionary.
 
     Args:
-        schema (Dict[str, str]): Column schema dictionary.
+        schema (Dict[str, str]): Dictionary mapping column names to descriptions.
 
     Returns:
-        str: MD5 hash representing the schema.
+        str: MD5 hash string representing the schema.
     """
     schema_str = json.dumps(schema, sort_keys=True)
     return hashlib.md5(schema_str.encode()).hexdigest()
@@ -27,13 +27,13 @@ def hash_schema(schema: Dict[str, str]) -> str:
 
 def load_cached_prompt(hash_value: str) -> Optional[str]:
     """
-    Loads the cached prompt if it exists.
+    Loads a previously cached prompt from disk if available.
 
     Args:
-        hash_value (str): The hash representing the schema.
+        hash_value (str): Hash representing the schema used for lookup.
 
     Returns:
-        Optional[str]: Cached system prompt content or None.
+        Optional[str]: Cached prompt content, or None if not found.
     """
     cache_file = CACHE_DIR / f"{hash_value}.txt"
     return cache_file.read_text() if cache_file.exists() else None
@@ -41,11 +41,11 @@ def load_cached_prompt(hash_value: str) -> Optional[str]:
 
 def save_cached_prompt(hash_value: str, prompt: str) -> None:
     """
-    Saves the generated system prompt locally to disk.
+    Stores a generated prompt in the cache directory using its hash.
 
     Args:
-        hash_value (str): The hash representing the schema.
-        prompt (str): The system prompt content to store.
+        hash_value (str): Hash representing the schema.
+        prompt (str): System prompt content to be saved.
     """
     cache_file = CACHE_DIR / f"{hash_value}.txt"
     cache_file.write_text(prompt)
