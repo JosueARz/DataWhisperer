@@ -26,7 +26,7 @@
 Install from TestPyPI:
 
 ```bash
-pip install -i https://test.pypi.org/simple/ datawhisperer
+pip install datawhisperer
 ```
 
 Or, for local development:
